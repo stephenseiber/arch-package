@@ -1,0 +1,69 @@
+to be done after successfull boot
+
+edit current profile of kde terminal change bash to fish
+
+sudo mkdir -p /tmp/yay
+cd /tmp/yay
+sudo chown -R stephen /tmp/yay
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+
+yay octopi --noconfirm                                          #  octopi,  octopi-notifier-frameworks
+yay jre8 --noconfirm                                            # Oracle Java 8 Runtime Environment
+yay minecraft-launcher --noconfirm                              # official non beta
+yay vivaldi --noconfirm                                         # aur/vivaldi
+set vivaldi as default
+sudo /opt/vivaldi/update-ffmpeg
+
+cd ~
+
+
+echo '[Wallet]'> /home/stephen/.config/kwalletrc
+echo 'Enabled=false'>> /home/stephen/.config/kwalletrc
+mkdir -p /home/stephen/.fonts/
+cd /home/stephen/.fonts/
+wget https://support.steampowered.com/downloads/1974-YFKL-4947/SteamFonts.zip
+unzip SteamFonts.zip && rm SteamFonts.zip
+
+lsblk
+
+
+enable numblock
+trackpad natural scrolling on
+disable screen lock
+disable screen edges
+disable screen touch
+in power setting turn close lid to turn off screen and shutoff when power button pressed
+replace noto sans with dejavu serif    #noto is google
+add terminal, octopi to favorites
+ocotpi enable aur using yay check devel, noconfirm, noedit, search for outdated package
+
+add discord to auto start       /usr/bin/discord --start-minimized
+add steam to auto start         /usr/bin/steam-native %U -silent
+
+down below is for gaming laptops
+create folders on desktop for drives
+blkid in one terminal
+open second terminal
+nano /etc/fstab
+UUID=uuid for "second drive second part"        /home/stephen/Desktop/folder for drive 2    ext4            rw,relatime     0 2
+UUID=uuid for "third drive third part"       /home/stephen/Desktop/folder for drive 3    ext4            rw,relatime     0 2
+sudo mount -a
+sudo chown -R stephen /home/stephen
+
+yay optimus-manager --noconfirm                                 #optimus-manager, optimus-manager-qt 
+sudo systemctl enable optimus-manager                           
+sudo systemctl start optimus-manager
+open optimus-manager-qt
+set optimus manager qt to launch at startup through right clicking on it in taskbar hit settings hit general and toggle launch at startup setup for nvidia when plugged in and 
+history clear
+sudo reflector --verbose -l 10 --sort rate --save /etc/pacman.d/mirrorlist
+open vlc
+right click panel
+click edit panel
+scrool over volume and click config systemtray
+click entries
+disable volume control, vlc
+
+reboot

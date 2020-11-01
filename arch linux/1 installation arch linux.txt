@@ -1,0 +1,142 @@
+boot into ventoy by hitting escape key followed by F9 on non gaming laptop and f2 key on gaming laptop and click bootmanager select sabrent and hit enter 
+select gparted hit enter on each prompt until gparted shows up
+full screen gparted
+hit alt+d then hit c select gpt hit apply
+hit right click hit new
+first partition on OS drive file system fat32 size 275MiB hit add
+second partition rest of space label arch
+hit green checkmark writes drive
+right click first partition hit manage flags select boot
+click the drive on the top right of screen and select second or third drive
+hit alt+d then hit c select gpt hit apply then format drive ext4 then hit green checkmark do this for any other drives that are not the os drive
+close gparted hit exit on desktop
+reboot hit F2
+hit boot from file
+select vtoyefi
+select ipxe 
+select mirror under Unite states archlinux-br.org
+select boot arch linux
+mount -o remount,size=4G /run/archiso/cowspace
+df -l
+pacman -Sy reflector fish
+fish
+ls /sys/firmware/efi/efivars
+timedatectl set-ntp true
+reflector --verbose -l 10 --sort rate --save /etc/pacman.d/mirrorlist
+
+
+nano /etc/pacman.conf
+uncommit 
+
+Color
+TotalDownload
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+
+
+pacman -Sy
+lsblk
+mount /dev/"rootdrive and 3st part" /mnt
+mkdir -p /mnt/boot
+mount /dev/"rootdrive and 1st part" /mnt/boot
+dd if=/dev/zero of=/mnt/swapfile bs=1M count=1024 status=progress
+chmod 600 /mnt/swapfile
+mkswap /mnt/swapfile
+swapon /mnt/swapfile
+
+
+pacstrap /mnt base linux linux-firmware reflector nano fish base-devel git plasma-meta plasma-wayland-session steam-native-runtime kde-applications-meta openra intel-ucode ntfs-3g vlc gparted bluez bluez-utils wget 0ad unzip discord vulkan-tools openmw wine-staging lutris winetricks pulseaudio-bluetooth   nvidia lib32-nvidia-utils lib32-opencl-nvidia nvidia-settings opencl-nvidia ppsspp qbittorrent
+
+genfstab -U /mnt >> /mnt/etc/fstab
+cp /etc/pacman.conf /mnt/etc/pacman.conf
+cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
+arch-chroot /mnt /bin/fish 
+nano /etc/locale.gen
+uncommit en_US.UTF-8 UTF-8 in example area
+locale-gen
+ln -s /usr/share/zoneinfo/America/Denver /etc/localtime
+hwclock --systohc --utc
+mkdir -p /etc/pacman.d/hooks
+
+
+from nano through mkinitcpio is for gaming laptops only for non gaming laptops skip to nano /etc/pacman.d/hooks/100-systemd-boot.hook
+nano /etc/mkinitcpio.conf
+MODULES="nvidia nvidia_modeset nvidia_uvm nvidia_drm"
+
+
+nano /etc/pacman.d/hooks/nvidia.hook
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Package
+Target=nvidia
+Target=linux
+
+[Action]
+Depends=mkinitcpio
+When=PostTransaction
+Exec=/usr/bin/mkinitcpio -p linux
+
+pacman -S nvidia
+
+
+
+
+
+nano /etc/pacman.d/hooks/100-systemd-boot.hook
+[Trigger]
+Type=Package
+Operation=Upgrade
+Target=systemd
+
+[Action]
+Description=Updating systemd-boot
+When=PostTransaction
+Exec=/usr/bin/bootctl update
+
+
+bootctl install
+pacman -S systemd
+nano /boot/loader/loader.conf
+default  arch.conf
+timeout  4
+console-mode max
+editor   no
+
+
+nano /boot/loader/entries/arch.conf
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /intel-ucode.img
+initrd  /initramfs-linux.img
+nvidia-drm.modeset=1
+options root="LABEL=arch" rw
+
+
+systemctl enable sddm
+systemctl enable bluetooth
+systemctl enable NetworkManager
+nano /etc/hostname  type name of laptop
+useradd -m -g users -s /bin/fish stephen
+chsh -s /bin/fish
+nano /etc/sudoers
+root ALL=(ALL) NOPASSWD: ALL
+stephen ALL=(ALL) NOPASSWD: ALL
+passwd
+passwd stephen
+pacman-key --init
+pacman-key --populate archlinux
+
+
+nano /etc/makepkg.conf
+#MAKEFLAGS="-j#"                   # = to threads on processor 8 for nongaming laptops 12 for gaming laptops
+
+history clear
+exit
+
+umount -R /mnt
+reboot
+
+
+
